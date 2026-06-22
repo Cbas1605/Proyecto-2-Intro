@@ -1,0 +1,12 @@
+{
+    "a": {
+        "password": "a",
+        "vic_def": 0,
+        "vic_atk": 0
+    },
+    "s": {
+        "password": "s",
+        "vic_def": 0,
+        "vic_atk": 0
+    }
+}

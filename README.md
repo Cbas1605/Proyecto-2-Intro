@@ -18,9 +18,6 @@ El objetivo es ganar tres rondas.
 * Python 3.10+
 * Tkinter
 
-Verificar instalación:
-
-python --version
 
 ---
 
@@ -41,19 +38,19 @@ Abrir terminal.
 
 Ejecutar:
 
-python nombre_del_archivo.py
+Proyecto2_JuegoDefensa.py
 
 ---
 
 ## Funcionalidades
 
-✔ Registro de jugadores
-✔ Inicio de sesión
-✔ Selección de facciones
-✔ Construcción de defensas
-✔ Compra de unidades
-✔ Sistema de combate
-✔ Ranking de jugadores
+Registro de jugadores
+Inicio de sesión
+Selección de facciones
+Construcción de defensas
+Compra de unidades
+Sistema de combate
+Ranking de jugadores
 
 ---
 

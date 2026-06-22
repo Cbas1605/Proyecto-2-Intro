@@ -77,6 +77,29 @@ TEXTO = {
     "Soldado": "SOL", "Tanque": "TAN", "Rapida": "RAP", "BASE": "BASE",
 }
 
+CARPETA_IMAGENES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "imagenes")
+IMG_PX = 44
+
+ARCHIVO_TORRE = {
+    "Basica": "torre_basica",
+    "Pesada": "torre_pesada",
+    "Magica": "torre_magica",
+    "Muro": "muro",
+}
+
+ARCHIVO_UNIDAD = {
+    "Soldado": "soldado",
+    "Tanque": "tanque",
+    "Rapida": "rapida",
+}
+
+ARCHIVO_FACCION = {
+    "Medieval": "medieval",
+    "Futurista": "futurista",
+    "Naturaleza": "naturaleza",
+    "Oscura": "oscura",
+}
+
 
 
 class Torre:
@@ -149,6 +172,9 @@ class Juego:
         self.ganadas_def = 0
         self.ganadas_atk = 0
 
+        self.imagenes = {}
+        self.cargar_imagenes()
+
         self.pantalla_login()
 
 
@@ -164,6 +190,32 @@ class Juego:
         f = open(ARCHIVO, "w", encoding="utf-8")
         json.dump(self.jugadores, f, indent=4, ensure_ascii=False)
         f.close()
+
+    def cargar_imagenes(self):
+        nombres = []
+        for archivo_tipo in list(ARCHIVO_TORRE.values()) + list(ARCHIVO_UNIDAD.values()) + ["base"]:
+            for archivo_faccion in ARCHIVO_FACCION.values():
+                nombres.append(archivo_tipo + "_" + archivo_faccion)
+        nombres.append("celda_vacia")
+        nombres.append("celda_zona")
+
+        for nombre in nombres:
+            ruta = os.path.join(CARPETA_IMAGENES, nombre + ".png")
+            if os.path.exists(ruta):
+                self.imagenes[nombre] = tk.PhotoImage(file=ruta)
+
+    def imagen_pieza(self, tipo, faccion):
+        if tipo in ARCHIVO_TORRE:
+            archivo_tipo = ARCHIVO_TORRE[tipo]
+        elif tipo in ARCHIVO_UNIDAD:
+            archivo_tipo = ARCHIVO_UNIDAD[tipo]
+        elif tipo == "BASE":
+            archivo_tipo = "base"
+        else:
+            return None
+        archivo_faccion = ARCHIVO_FACCION.get(faccion, "medieval")
+        clave = archivo_tipo + "_" + archivo_faccion
+        return self.imagenes.get(clave)
 
     
 
@@ -402,8 +454,10 @@ class Juego:
         for f in range(FILAS):
             filab = []
             for c in range(COLUMNAS):
-                b = tk.Button(marco, text="", width=5, height=2,
-                              relief="ridge", bd=1, font=("Arial", 9, "bold"),
+                img_inicial = self.imagenes["celda_zona"] if c == 0 else self.imagenes["celda_vacia"]
+                b = tk.Button(marco, image=img_inicial, width=IMG_PX, height=IMG_PX,
+                              compound="center", relief="ridge", bd=1,
+                              font=("Arial", 9, "bold"),
                               command=lambda ff=f, cc=c: self.clic_celda(ff, cc))
                 b.grid(row=f, column=c, padx=1, pady=1)
                 filab.append(b)
@@ -461,23 +515,18 @@ class Juego:
                 b = self.botones[f][c]
                 if cosa is None:
                     if c == 0:
-                       
-                        b.config(text="", bg=C_ZONA, fg="black")
+                        b.config(image=self.imagenes["celda_zona"], text="")
                     else:
-                        b.config(text="", bg=C_CELDA, fg="black")
+                        b.config(image=self.imagenes["celda_vacia"], text="")
                 elif cosa == "BASE":
-                    b.config(text="BASE", bg=FACCIONES[self.faccion_def],
-                             fg="white")
+                    img = self.imagen_pieza("BASE", self.faccion_def)
+                    b.config(image=img, text=str(self.base_vida), fg="white")
                 elif isinstance(cosa, Torre):
-                    if cosa.tipo == "Muro":
-                        color = COLOR_MURO[self.faccion_def]   # color de muro segun faccion
-                    else:
-                        color = FACCIONES[self.faccion_def]
-                    b.config(text=TEXTO[cosa.tipo] + "\n" + str(cosa.vida),
-                             bg=color, fg="white")
+                    img = self.imagen_pieza(cosa.tipo, self.faccion_def)
+                    b.config(image=img, text=str(cosa.vida), fg="white")
                 elif isinstance(cosa, Unidad):
-                    b.config(text=TEXTO[cosa.tipo] + "\n" + str(cosa.vida),
-                             bg=FACCIONES[self.faccion_atk], fg="white")
+                    img = self.imagen_pieza(cosa.tipo, self.faccion_atk)
+                    b.config(image=img, text=str(cosa.vida), fg="white")
 
 
 
